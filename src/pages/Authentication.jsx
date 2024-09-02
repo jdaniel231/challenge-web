@@ -1,0 +1,103 @@
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+import { validateEmail, validatePassword } from '../utlities/validations.js';
+import { Link } from 'react-router-dom';
+
+export const PageType = Object.freeze({  
+  LOGIN: 0,
+  REGISTER: 1
+});
+
+const initialErrorState = {
+  email: ' ',
+  password: ' ',
+  api: ' ',
+}
+
+const Authentication = ({ pageType }) => {
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState(initialErrorState);
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  }
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(!validateEmail(email)) { 
+      setErrors({ 
+        ...errors, 
+        email: "Invalid email" 
+      });
+    }
+    if(!validatePassword(password)) {
+      setErrors({ 
+        ...errors, 
+        password: "A senha deve ter pelo menos 6 caracteres"
+      });
+    }
+  }
+  return (
+    <div className="bg-white">
+      <div className="mx-auto max-w-96 px-2 sm:px-6 lg:px-8 py-12">
+        <h3 className="text-2xl font-bold">
+          {pageType === PageType.LOGIN ? "Login" : "Register"}
+        </h3>
+
+        {
+          <p className="text-sm text-gray-500 mt-4">
+            {pageType === PageType.LOGIN ? "Don't have an account?" : "Already have an account?"}
+            <Link className='underline ms-1' to='/register'>
+              {pageType === PageType.LOGIN ? " Register" : " Login"}
+            </Link>
+          </p>
+        }
+        <form onSubmit={handleSubmit}>
+          <div>
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="Email" 
+              className="mt-4 py-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={email}
+              onChange={handleEmailChange}
+              required
+            />
+            {errors.email && <p className='text-red-500 text-sm text-medium mt-1'>{errors.email}</p>}
+          </div>
+
+          <div>
+            <input 
+              type="password" 
+              name="password" 
+              placeholder="Password" 
+              className="mt-4 py-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={password}
+              onChange={handlePasswordChange}
+              required
+            />
+            {errors.email && <p className='text-red-500 text-sm text-medium mt-1'>{errors.password}</p>}
+          </div>
+          <button 
+            type="submit" 
+            className="mt-4 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            {pageType === PageType.LOGIN ? "Enter" : "Create"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+Authentication.propTypes = {
+  pageType: PropTypes.number.isRequired
+};
+
+export default Authentication;
