@@ -7,6 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Authentication, { PageType } from './pages/Authentication.jsx';
+import { CookiesProvider } from 'react-cookie';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-     <RouterProvider router={router} />
+    <CookiesProvider>
+      <RouterProvider router={router} />
+    </CookiesProvider>
   </StrictMode>,
 )
