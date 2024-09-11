@@ -1,11 +1,9 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { validateEmail, validatePassword } from '../utlities/validations.js';
 import { Link, useNavigate } from 'react-router-dom';
-// import {registerApi, loginApi} from '../api/authentication.js';
 import authApi from '../api/authentication.js';
-
-// Agora você pode usar authApi.loginApi e authApi.registerApi
+import { useCookies } from 'react-cookie';
 
 
 export const PageType = Object.freeze({
@@ -21,12 +19,19 @@ const initialErrorState = {
 
 const Authentication = ({ pageType }) => {
 
+  const [cookies, setCookie] = useCookies();
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(initialErrorState);
+  
+  useEffect(() => {
+    if(cookies.jwt) {
+      navigate('/');
+    }
+  }, []);
 
+  
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   }
@@ -64,36 +69,42 @@ const Authentication = ({ pageType }) => {
     
     if (!hasErros) {
       if (pageType === PageType.LOGIN) {
-        const [result, error] = await authApi.loginApi({
+        const [response, error] = await authApi.loginApi({
           user: {
             email: email,
             password: password
           }
         });
-        handleResponse(result, error);
+        handleResponse([response, error]);
       } else {
-        const [result, error] = await authApi.registerApi({
+        const [response, error] = await authApi.registerApi({
           user: {
             email: email,
             password: password
           }
         });
-        handleResponse(result, error);
+        handleResponse([response, error]);
       }
     }
     
-    
   }
-  const handleResponse = (result, error) => {
+
+  const handleResponse = async ([response, error]) => {
     if (error) {
       setErrors({
         ...errors,
         api: error
       });
-      alert(`Erro: ${error}`);
+      alert(` ${error}`);
     } else {
-      const message = result.message;
-      const user = result.user;
+      const jwt = response.headers.get('Authorization');
+      // const result = await response.json();
+      // const message = result.message;
+      // const user = result.data
+
+      if(jwt) {
+        setCookie('jwt', jwt);
+      }
   
       if (pageType === PageType.LOGIN) {
         alert("Login realizado com sucesso!");
@@ -105,6 +116,7 @@ const Authentication = ({ pageType }) => {
       }
     }
   };
+  
 
   return (
     <div className="bg-white">

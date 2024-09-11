@@ -14,11 +14,13 @@ const loginApi = async (BodyObject) => {
   try {
     const response = await fetch(`${apiUrl}/login`, requestOptions);
     if (response.ok) {
-      const data = await response.json();
-      return [data, ''];
+      return [response, ''];
     }
-    const errorData = await response.text();
-    return ['', `Erro no servidor: ${errorData.errors?.join(', ') || errorData.message || response.statusText}`];
+    if(response.status === 401) {
+      return ['', 'Usuário ou senha incorretos'];
+    }
+    // const errorData = await response.text();
+    // return ['', `Erro no servidor: ${errorData.errors?.join(', ') || errorData.message || response.statusText}`];
   } catch (error) {
     console.error('Error: ', error);
     return ['', `Erro de conexão: ${error.message}`];
@@ -38,15 +40,39 @@ const registerApi = async (BodyObject) => {
   try {
     const response = await fetch(`${apiUrl}/signup`, requestOptions);
     if (response.ok) {
-      const data = await response.json();
-      return [data, ''];
+      return [response, ''];
     }
-    const errorData = await response.text();
-    return ['', `Erro no servidor: ${errorData.errors?.join(', ') || errorData.message || response.statusText}`];
+    if(response.status === 422) {
+      return ['', 'Usuário ja esta cadastrado'];
+    }
+    // const errorData = await response.text();
+    // return ['', `Erro no servidor: ${errorData.errors?.join(', ') || errorData.message || response.statusText}`];
   } catch (error) {
     console.error('Error: ', error);
     return ['', `Erro de conexão: ${error.message}`];
   }
-} 
+}
 
-export default { loginApi, registerApi };
+const logoutApi = async (jwtToken) => {
+  const requestOptions = {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': jwtToken
+    },
+  };
+
+  try {
+    const response = await fetch(`${apiUrl}/logout`, requestOptions);
+    if (response.ok) {
+      return [response, ''];
+    }
+    if(response.status === 401) {
+      return ['', 'Algo deu errado, tente novamente'];
+    }
+  } catch (error) {
+    console.error('Error: ', error);
+    return ['', `Erro de conexão: ${error.message}`];
+  }
+}
+export default { loginApi, registerApi, logoutApi };
