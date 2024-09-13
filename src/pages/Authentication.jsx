@@ -4,6 +4,7 @@ import { validateEmail, validatePassword } from '../utlities/validations.js';
 import { Link, useNavigate } from 'react-router-dom';
 import authApi from '../api/authentication.js';
 import { useCookies } from 'react-cookie';
+import Button from '../elements/Button.jsx';
 
 
 export const PageType = Object.freeze({
@@ -24,14 +25,14 @@ const Authentication = ({ pageType }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(initialErrorState);
-  
+
   useEffect(() => {
-    if(cookies.jwt) {
+    if (cookies.jwt) {
       navigate('/');
     }
   }, []);
 
-  
+
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   }
@@ -54,19 +55,19 @@ const Authentication = ({ pageType }) => {
       password: ' ',
       api: ' ',
     };
-    
+
     if (!validateEmail(email)) {
       newErros.email = "Invalid email";
     }
     if (!validatePassword(password)) {
       newErros.password = "A senha deve ter pelo menos 6 caracteres";
     }
-    
+
     setErrors(newErros);
-    
+
 
     const hasErros = Object.values(newErros).some(erro => erro !== ' ');
-    
+
     if (!hasErros) {
       if (pageType === PageType.LOGIN) {
         const [response, error] = await authApi.loginApi({
@@ -86,7 +87,7 @@ const Authentication = ({ pageType }) => {
         handleResponse([response, error]);
       }
     }
-    
+
   }
 
   const handleResponse = async ([response, error]) => {
@@ -102,10 +103,10 @@ const Authentication = ({ pageType }) => {
       // const message = result.message;
       // const user = result.data
 
-      if(jwt) {
+      if (jwt) {
         setCookie('jwt', jwt);
       }
-  
+
       if (pageType === PageType.LOGIN) {
         alert("Login realizado com sucesso!");
         navigate('/');
@@ -116,7 +117,7 @@ const Authentication = ({ pageType }) => {
       }
     }
   };
-  
+
 
   return (
     <div className="bg-white">
@@ -136,7 +137,7 @@ const Authentication = ({ pageType }) => {
             </Link>
           </p>
         }
-        <form onSubmit={handleSubmit}>
+        <form>
           <div>
             <input
               type="email"
@@ -162,12 +163,11 @@ const Authentication = ({ pageType }) => {
             />
             {errors.password && errors.password !== ' ' && <p className='text-red-500 text-sm text-medium mt-1'>{errors.password}</p>}
           </div>
-          <button
-            type="submit"
-            className="mt-4 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          <Button
+            handleClick={handleSubmit}
           >
-            {pageType === PageType.LOGIN ? "Enter" : "Create"}
-          </button>
+            {pageType === PageType.LOGIN ? "Enter" : "Register"}
+          </Button>
         </form>
       </div>
     </div>

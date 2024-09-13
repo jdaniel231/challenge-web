@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import Authentication, { PageType } from './pages/Authentication.jsx';
 import { CookiesProvider } from 'react-cookie';
+import AddChallenge from './pages/AddChallenge.jsx';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
     path: "/register",
     element:  <Authentication pageType={PageType.REGISTER} />,
   },
+  {
+    path: "/add-challenge",
+    element: <AddChallenge />,
+  }
 ]);
 
 createRoot(document.getElementById('root')).render(
